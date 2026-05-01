@@ -153,126 +153,142 @@ grid-column:span 2;text-align:center;">
 </div>
 
 <script>
-
-const pedidoKey = "carritoPedido";
-let productoSeleccionado = {};
-
-// BOTONES
-btnPizza.onclick = () => location.href="https://1967-rob.github.io/precios-alo-rico/";
-btnLomitos.onclick = () => location.href="https://alo-rico.github.io/lomitos/";
-btnBebidas.onclick = () => location.href="https://alo-rico.github.io/bebidas/";
-btnCarrito.onclick = () => {
- document.getElementById("pedido-flotante").classList.toggle("activo");
-};
-
-// TOTAL VERDE
 function actualizarMensajeTotal() {
-  const pedido = JSON.parse(localStorage.getItem(pedidoKey)) || [];
-  const div = document.getElementById("mensaje-total");
-
-  if(pedido.length>0){
-    const total = pedido.reduce((sum,p)=>sum+p.precio,0);
-    div.innerText = "💰 Total: Gs. " + total.toLocaleString();
-    div.style.display="block";
+  const pedido = JSON.parse(localStorage.getItem("carritoPedido")) || [];
+  const mensajeTotal = document.getElementById("mensaje-total");
+  if (!mensajeTotal) return;
+  if (pedido.length > 0) {
+    const total = pedido.reduce((sum, p) => sum + p.precio, 0);
+    mensajeTotal.textContent = `💰 Total: Gs. ${total.toLocaleString()}`;
+    mensajeTotal.style.display = "block";
   } else {
-    div.style.display="none";
+    mensajeTotal.style.display = "none";
   }
 }
 
-// CARGAR MENU
-document.addEventListener('DOMContentLoaded', async () => {
+  const pedidoKey = "carritoPedido";
+  let productosGlobal = {};
+  let productoSeleccionado = {nombre:"", precio:0};
 
-const res = await fetch("https://raw.githubusercontent.com/Alo-Rico/hamburguesa/main/precios.json");
-const productos = await res.json();
+document.getElementById("btnPizza").onclick = () => {
+  window.location.href = "https://1967-rob.github.io/pizza/";
+};
 
-const menu = document.getElementById('menu');
+document.getElementById("btnHamburguesas").onclick = () => {
+  window.location.href = "https://alo-rico.github.io/precios-alorico-hamburguesa/";
+};
 
-Object.entries(productos).forEach(([nombre, info]) => {
+document.getElementById("btnLomitos").onclick = () => {
+  window.location.href = "https://alo-rico.github.io/lomitos/";
+};
 
-  const card = document.createElement('div');
-  card.className = 'product';
-
-  card.innerHTML = `
-    <img src="imagen/${info.imagen}">
-    <h3>${nombre}</h3>
-    <p>Gs. ${info.precio.toLocaleString()}</p>
-  `;
-
-  card.onclick = () => abrirPopup(nombre, info.precio);
-
-  menu.appendChild(card);
-
+ document.addEventListener("click", function(e) {
+  const panel = document.getElementById("pedido-flotante");
+  const boton = document.getElementById("btnCarrito");
+  if (e.target.tagName === "IMG" && e.target.src.includes("basurero.png")) return;
+  if (panel.classList.contains("activo") && !panel.contains(e.target) && e.target !== boton) {
+    panel.classList.remove("activo");
+  }
 });
 
-renderPedido();
-actualizarMensajeTotal();
+ document.addEventListener("DOMContentLoaded", () => {
+    const listaPedido = document.getElementById("lista-pedido");
+    const totalPedido = document.getElementById("total-pedido");
+    const btnBorrar = document.getElementById("btn-borrar");
+    const btnWhatsapp = document.getElementById("enviar-whatsapp");
 
-});
-
-// POPUP
-function abrirPopup(nombre, precio){
-  productoSeleccionado={nombre,precio};
-  document.getElementById("popup-nombre").innerText=nombre;
-  document.getElementById("popup-cantidad").style.display="flex";
+ function renderizarPedido() {
+  const pedido = JSON.parse(localStorage.getItem(pedidoKey)) || [];
+  listaPedido.innerHTML = "";
+  let total = 0;
+  pedido.forEach((p, i) => {
+    const li = document.createElement("li");
+    li.innerHTML = `${p.nombre} - Gs. ${p.precio.toLocaleString()} 
+      <img src='basurero.png' onclick='eliminarItem(${i})' style='width:18px;cursor:pointer;float:right;'/>`;
+    listaPedido.appendChild(li);
+    total += p.precio;
+  });
+  totalPedido.textContent = `Total: Gs. ${total.toLocaleString()}`;
+  actualizarMensajeTotal();   
 }
 
-function cerrarPopup(){
- document.getElementById("popup-cantidad").style.display="none";
-}
+window.eliminarItem = function(index) {
+  const pedido = JSON.parse(localStorage.getItem(pedidoKey)) || [];
+  pedido.splice(index, 1);
+  localStorage.setItem(pedidoKey, JSON.stringify(pedido));
+  renderizarPedido();
+  actualizarMensajeTotal(); 
+};
 
-function confirmarCantidad(){
- const cant = parseInt(document.getElementById("popup-input").value)||1;
- const pedido = JSON.parse(localStorage.getItem(pedidoKey))||[];
 
- pedido.push({
-  nombre: productoSeleccionado.nombre+" x"+cant,
-  precio: productoSeleccionado.precio*cant
- });
-
- localStorage.setItem(pedidoKey, JSON.stringify(pedido));
-
- cerrarPopup();
- renderPedido();
- actualizarMensajeTotal();
-}
-
-// PEDIDO
-function renderPedido(){
- const lista=document.getElementById("lista-pedido");
- const totalTxt=document.getElementById("total-pedido");
-
- const pedido=JSON.parse(localStorage.getItem(pedidoKey))||[];
-
- lista.innerHTML="";
- let total=0;
-
- pedido.forEach(p=>{
-  const li=document.createElement("li");
-  li.textContent=p.nombre+" - Gs. "+p.precio.toLocaleString();
-  lista.appendChild(li);
-  total+=p.precio;
- });
-
- totalTxt.innerText="Total: Gs. "+total.toLocaleString();
-}
-
-function borrarPedido(){
+  btnBorrar.onclick = () => {
+  localStorage.removeItem(pedidoKey);
+  renderizarPedido();
+  actualizarMensajeTotal();
+  document.getElementById("pedido-flotante").classList.remove("activo");
+};
+  document.getElementById("enviar-whatsapp").onclick = () => {
+    const pedido = JSON.parse(localStorage.getItem(pedidoKey)) || [];
+    if (pedido.length === 0) return alert("No hay nada en el pedido");
+    const mensaje = pedido.map(p => `- ${p.nombre}`).join('%0A');
+    const total = pedido.reduce((sum, p) => sum + p.precio, 0);
+    const texto = `Hola, Estoy ingresando desde la Plataforma:%0A${mensaje}%0A%0ATotal: Gs. ${total.toLocaleString()}`;
+    window.open(`https://wa.me/+595971891251?text=${texto}`, '_blank');
  localStorage.removeItem(pedidoKey);
- renderPedido();
- actualizarMensajeTotal();
+renderizarPedido();               // ← Esta línea te falta
+actualizarMensajeTotal();
+document.getElementById("pedido-flotante").classList.remove("activo");
+ };
+
+  async function cargarMenu() {
+  try {
+    const res = await fetch("precios-bebidas.json");
+    const productos = await res.json();
+    productosGlobal = productos;
+    const menu = document.getElementById('menu');
+    menu.innerHTML = '';
+    Object.entries(productos).forEach(([nombre, info]) => {
+      const card = document.createElement('div');
+      card.className = 'product';
+      card.innerHTML = `
+        <img src="img-bebidas/${info.imagen}" alt="${nombre}" class="img-click">
+        <h3>${nombre}</h3>
+        <p>Gs. ${info.precio.toLocaleString()}</p>
+      `;
+      card.querySelector(".img-click").addEventListener("click", () => abrirPopup(nombre, info.precio));
+      menu.appendChild(card);
+    });
+  } catch (err) {
+    document.getElementById('menu').innerHTML = "<p style='color:red;'>No se pudo cargar el menú</p>";
+  }
 }
 
-function enviarPedido(){
- const pedido=JSON.parse(localStorage.getItem(pedidoKey))||[];
- if(pedido.length===0) return alert("Vacío");
 
- let msg="Hola quiero pedir:\n";
- pedido.forEach(p=> msg+=p.nombre+"\n");
+    window.abrirPopup = function(nombre, precio){
+      productoSeleccionado = {nombre, precio};
+      document.getElementById("popup-nombre").textContent = nombre;
+      document.getElementById("popup-input").value = 1;
+      document.getElementById("popup-cantidad").style.display = "flex";
+    }
 
- window.open("https://wa.me/?text="+encodeURIComponent(msg));
+    window.cerrarPopup = function(){
+      document.getElementById("popup-cantidad").style.display = "none";
+    }
+
+   window.confirmarCantidad = function(){
+  const cantidad = parseInt(document.getElementById("popup-input").value) || 1;
+  const pedido = JSON.parse(localStorage.getItem(pedidoKey)) || [];
+  pedido.push({ nombre: `${productoSeleccionado.nombre} x${cantidad}`, precio: productoSeleccionado.precio * cantidad });
+  localStorage.setItem(pedidoKey, JSON.stringify(pedido));
+  cerrarPopup();
+  renderizarPedido();
+  actualizarMensajeTotal();   
 }
 
+    cargarMenu();
+    renderizarPedido();
+    actualizarMensajeTotal(); 
+  });
 </script>
-
 </body>
 </html>

@@ -104,22 +104,28 @@ document.getElementById("btnCarrito").onclick = () => {
   alert("Abrir pedido (igual que bebidas)");
 };
 
-// CARGAR MENU
+// 🔥 CARGAR MENU (CORREGIDO)
 document.addEventListener('DOMContentLoaded', async () => {
-  const menu = document.getElementById('menu');
+  try {
+    const menu = document.getElementById('menu');
 
-  const res = await fetch("https://raw.githubusercontent.com/Alo-Rico/hamburguesa/main/precios.json");
+    const res = await fetch("https://raw.githubusercontent.com/Alo-Rico/hamburguesa/main/precios.json");
+    const productos = await res.json(); // 👈 ESTO FALTABA
 
-  Object.entries(productos).forEach(([nombre, info]) => {
-    const card = document.createElement('div');
-    card.className = 'product';
-    card.innerHTML = `
-      <img src="imagen/${info.imagen}">
-      <h3>${nombre}</h3>
-      <p>Gs. ${info.precio.toLocaleString()}</p>
-    `;
-    menu.appendChild(card);
-  });
+    Object.entries(productos).forEach(([nombre, info]) => {
+      const card = document.createElement('div');
+      card.className = 'product';
+      card.innerHTML = `
+        <img src="imagen/${info.imagen}">
+        <h3>${nombre}</h3>
+        <p>Gs. ${info.precio.toLocaleString()}</p>
+      `;
+      menu.appendChild(card);
+    });
+
+  } catch (error) {
+    console.error("Error cargando menú:", error);
+  }
 });
 </script>
 

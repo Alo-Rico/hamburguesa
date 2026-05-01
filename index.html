@@ -242,7 +242,7 @@ document.getElementById("pedido-flotante").classList.remove("activo");
 
   async function cargarMenu() {
   try {
-    const res = await fetch("precios.json");
+   const res = await fetch("https://raw.githubusercontent.com/Alo-Rico/hamburguesa/main/precios.json");
     const productos = await res.json();
     productosGlobal = productos;
     const menu = document.getElementById('menu');
@@ -251,7 +251,7 @@ document.getElementById("pedido-flotante").classList.remove("activo");
       const card = document.createElement('div');
       card.className = 'product';
       card.innerHTML = `
-        <img src="img-bebidas/${info.imagen}" alt="${nombre}" class="img-click">
+     <img src="imagen/${info.imagen}">
         <h3>${nombre}</h3>
         <p>Gs. ${info.precio.toLocaleString()}</p>
       `;

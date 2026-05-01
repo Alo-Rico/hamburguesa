@@ -36,7 +36,7 @@ header img.icono { width:60px; }
 }
 .product h3 { margin:10px 0 5px; }
 
-/* 🔥 EXACTO IGUAL A BEBIDAS */
+/* BOTONES */
 .btn-grid {
   position: fixed;
   right: 15px;
@@ -79,7 +79,6 @@ header img.icono { width:60px; }
 
 <div class="menu-container" id="menu"></div>
 
-<!-- 🔥 BOTONES COMPLETOS -->
 <div class="btn-grid">
   <button id="btnPizza" class="btn-flotante">PIZZAS</button>
   <button id="btnLomitos" class="btn-flotante">LOMITOS</button>
@@ -88,8 +87,12 @@ header img.icono { width:60px; }
 </div>
 
 <script>
+// 🔥 PEDIDO GLOBAL
+let pedido = [];
+
+// BOTONES
 document.getElementById("btnPizza").onclick = () => {
-  window.location.href = "https://alo-rico.github.io/pizza/";  
+  window.location.href = "https://alo-rico.github.io/pizza/";
 };
 
 document.getElementById("btnLomitos").onclick = () => {
@@ -100,26 +103,60 @@ document.getElementById("btnBebidas").onclick = () => {
   window.location.href = "https://alo-rico.github.io/bebidas/";
 };
 
+// 🔥 VER PEDIDO
 document.getElementById("btnCarrito").onclick = () => {
-  alert("Abrir pedido (igual que bebidas)");
+  if (pedido.length === 0) {
+    alert("El pedido está vacío");
+    return;
+  }
+
+  let mensaje = "Tu pedido:\n\n";
+  let total = 0;
+
+  pedido.forEach(item => {
+    mensaje += `${item.cantidad} x ${item.nombre} - Gs. ${(item.precio * item.cantidad).toLocaleString()}\n`;
+    total += item.precio * item.cantidad;
+  });
+
+  mensaje += `\nTotal: Gs. ${total.toLocaleString()}`;
+
+  alert(mensaje);
 };
 
-// 🔥 CARGAR MENU (CORREGIDO)
+// 🔥 AGREGAR PRODUCTO
+function agregarProducto(nombre, precio) {
+  const existente = pedido.find(p => p.nombre === nombre);
+
+  if (existente) {
+    existente.cantidad++;
+  } else {
+    pedido.push({ nombre, precio, cantidad: 1 });
+  }
+
+  console.log("Pedido:", pedido);
+}
+
+// 🔥 CARGAR MENU
 document.addEventListener('DOMContentLoaded', async () => {
   try {
     const menu = document.getElementById('menu');
 
     const res = await fetch("https://raw.githubusercontent.com/Alo-Rico/hamburguesa/main/precios.json");
-    const productos = await res.json(); // 👈 ESTO FALTABA
+    const productos = await res.json();
 
     Object.entries(productos).forEach(([nombre, info]) => {
       const card = document.createElement('div');
       card.className = 'product';
+
       card.innerHTML = `
         <img src="imagen/${info.imagen}">
         <h3>${nombre}</h3>
         <p>Gs. ${info.precio.toLocaleString()}</p>
       `;
+
+      // 👇 CLICK AGREGA AL PEDIDO
+      card.onclick = () => agregarProducto(nombre, info.precio);
+
       menu.appendChild(card);
     });
 

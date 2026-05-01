@@ -120,13 +120,13 @@
     .borrar { background: red; color: white; }
     .whatsapp { background: green; color: white; }
 
-    /* 🔥 BOTONES FLOTANTES */
+    /* 🔥 BOTONES FLOTANTES 2x2 */
     .nav-float {
       position: fixed;
       bottom: 90px;
       right: 15px;
-      display: flex;
-      flex-direction: column;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
       gap: 10px;
       z-index: 1000;
     }
@@ -134,18 +134,17 @@
     .nav-float .btn {
       border: none;
       border-radius: 25px;
-      padding: 12px 18px;
+      padding: 10px;
       font-weight: bold;
       color: white;
       cursor: pointer;
       box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+      font-size: 12px;
     }
 
     .pizza { background: #f7b500; color: black; }
-    .hamburguesa { background: #28a745; }
     .lomito { background: #ff5722; }
     .bebida { background: #00bcd4; }
-    .pedido { background: #007bff; }
 
     @media (max-width: 768px) {
       .nav-float {
@@ -189,20 +188,13 @@
 <!-- 🔥 BOTONES FLOTANTES -->
 <div class="nav-float">
   <button id="btnPizza" class="btn pizza">PIZZAS</button>
-  <button id="btnHamburguesas" class="btn hamburguesa">HAMBURGUESAS</button>
   <button id="btnLomitos" class="btn lomito">LOMITOS</button>
   <button id="btnBebidas" class="btn bebida">BEBIDAS</button>
-  <button id="btnPedido" class="btn pedido">MI PEDIDO</button>
 </div>
 
 <script>
-// 🔗 NAVEGACIÓN CORRECTA
 document.getElementById("btnPizza").onclick = () => {
   window.location.href = "https://1967-rob.github.io/precios-alo-rico/";
-};
-
-document.getElementById("btnHamburguesas").onclick = () => {
-  window.location.href = "https://alo-rico.github.io/precios-alorico-hamb-lomito/";
 };
 
 document.getElementById("btnLomitos").onclick = () => {
@@ -213,11 +205,7 @@ document.getElementById("btnBebidas").onclick = () => {
   window.location.href = "https://alo-rico.github.io/bebidas/";
 };
 
-document.getElementById("btnPedido").onclick = () => {
-  document.getElementById("pedido-flotante").scrollIntoView({ behavior: "smooth" });
-};
-
-// 🍔 CARGAR MENÚ
+// CARGAR MENÚ
 document.addEventListener('DOMContentLoaded', async () => {
   const menu = document.getElementById('menu');
 

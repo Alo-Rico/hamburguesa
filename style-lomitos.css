@@ -5,25 +5,30 @@ body {
   margin: 0;
   padding: 0;
 }
+
 header {
   margin-top: 20px;
 }
+
 .logo {
   width: 120px;
   height: auto;
 }
+
 .icono {
   width: 60px;
   height: auto;
   margin-bottom: 10px;
 }
+
 .menu-container {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
   padding: 20px;
-  padding-bottom: 120px; /* 👈 espacio extra para que no tape el popout */
+  padding-bottom: 320px; /* 👈 espacio para pedido + botones */
 }
+
 .product {
   width: 180px;
   background: white;
@@ -33,40 +38,50 @@ header {
   cursor: pointer;
   transition: transform 0.2s;
 }
+
 .product:hover {
   transform: scale(1.03);
 }
+
 .product img {
   width: 100%;
   height: 140px;
   object-fit: cover;
   border-radius: 10px 10px 0 0;
 }
+
 .product h3 {
   margin: 10px 0 5px;
   font-size: 16px;
 }
+
 .product p {
   margin: 0 0 10px;
   color: #444;
   font-weight: bold;
 }
+
+/* POPUP */
 .popup {
   display: none;
   position: fixed;
   z-index: 1001;
-  left: 0; top: 0;
-  width: 100%; height: 100%;
+  left: 0; 
+  top: 0;
+  width: 100%; 
+  height: 100%;
   background: rgba(0,0,0,0.5);
   justify-content: center;
   align-items: center;
 }
+
 .popup-content {
   background: white;
   padding: 20px;
   border-radius: 10px;
   text-align: center;
 }
+
 .popup-buttons button {
   margin: 10px;
   padding: 10px 20px;
@@ -75,14 +90,20 @@ header {
   border-radius: 5px;
   cursor: pointer;
 }
+
+/* OVERLAY */
 .overlay {
   display: none;
   position: fixed;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
+  top: 0; 
+  left: 0;
+  width: 100%; 
+  height: 100%;
   background: rgba(0,0,0,0.5);
   z-index: 1000;
 }
+
+/* 🧾 PEDIDO */
 #pedido-flotante {
   position: fixed;
   bottom: 0;
@@ -95,13 +116,16 @@ header {
   padding: 10px;
   text-align: left;
 }
+
 #pedido-flotante h3 {
   margin: 5px 0;
 }
+
 #pedido-flotante ul {
   margin: 0;
   padding-left: 20px;
 }
+
 #pedido-flotante button {
   margin-top: 5px;
   margin-right: 5px;
@@ -111,14 +135,55 @@ header {
   border-radius: 4px;
   cursor: pointer;
 }
+
 .borrar { background-color: red; color: white; }
 .whatsapp { background-color: green; color: white; }
-.menu-container {
-  padding-bottom: 280px; /* Aumentamos un poco más */
+
+/* 🔥 BOTONES FLOTANTES (IGUAL A BEBIDAS) */
+.nav-float {
+  position: fixed;
+  bottom: 90px; /* 👈 arriba del pedido */
+  right: 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  z-index: 1100;
 }
 
+.nav-float .btn {
+  border: none;
+  border-radius: 25px;
+  padding: 12px 18px;
+  font-weight: bold;
+  color: white;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+  transition: transform 0.2s;
+}
+
+.nav-float .btn:hover {
+  transform: scale(1.05);
+}
+
+/* COLORES */
+.pizza { background: #f7b500; color: black; }
+.hamburguesa { background: #28a745; }
+.lomito { background: #ff5722; }
+.bebida { background: #00bcd4; }
+.pedido { background: #007bff; }
+
+/* 📱 RESPONSIVE */
 @media screen and (max-width: 768px) {
   .menu-container {
-    padding-bottom: 320px; /* Más margen aún en móviles */
+    padding-bottom: 360px;
+  }
+
+  .nav-float {
+    bottom: 110px;
+  }
+
+  .nav-float .btn {
+    padding: 10px 14px;
+    font-size: 12px;
   }
 }

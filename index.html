@@ -35,7 +35,6 @@ header img.icono { width:60px; }
   object-fit:cover;
   border-radius:10px 10px 0 0;
 }
-.product h3 { margin:10px 0 5px; }
 
 /* BOTONES */
 .btn-grid {
@@ -56,10 +55,6 @@ header img.icono { width:60px; }
   font-weight: bold;
   cursor: pointer;
   width: 140px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  box-shadow: 0 4px 6px rgba(0,0,0,0.2);
 }
 
 #btnPizza { background:#ffc107; color:#000; }
@@ -140,163 +135,138 @@ header img.icono { width:60px; }
 
 <div id="mensaje-total" style="display:none;
 background:#28a745;color:#fff;padding:8px 14px;margin-bottom:5px;
-border-radius:10px;font-weight:bold;box-shadow:0 4px 8px rgba(0,0,0,0.3);
+border-radius:10px;font-weight:bold;
 grid-column:span 2;text-align:center;">
 💰 Total: Gs. 0
 </div>
 
-<button id="btnPizza" class="btn-flotante">PIZZAS</button>
-<button id="btnLomitos" class="btn-flotante">LOMITOS</button>
-<button id="btnBebidas" class="btn-flotante">BEBIDAS</button>
-<button id="btnCarrito" class="btn-flotante">MI PEDIDO</button>
+<button id="btnPizza">PIZZAS</button>
+<button id="btnLomitos">LOMITOS</button>
+<button id="btnBebidas">BEBIDAS</button>
+<button id="btnCarrito">MI PEDIDO</button>
 
 </div>
 
-<script>
-function actualizarMensajeTotal() {
-  const pedido = JSON.parse(localStorage.getItem("carritoPedido")) || [];
-  const mensajeTotal = document.getElementById("mensaje-total");
-  if (!mensajeTotal) return;
+<!-- 🔥 FIREBASE -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
+import { getDatabase, ref, push, onValue, remove } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-database.js";
 
-  if (pedido.length > 0) {
-    const total = pedido.reduce((sum, p) => sum + p.precio, 0);
-    mensajeTotal.textContent = `💰 Total: Gs. ${total.toLocaleString()}`;
-    mensajeTotal.style.display = "block";
-  } else {
-    mensajeTotal.style.display = "none";
-  }
+const firebaseConfig = {
+  apiKey: "AIzaSyADGYsqhbCFuKj2fXpontLpND_rtT7Nlno",
+  authDomain: "alorico-59754.firebaseapp.com",
+  databaseURL: "https://alorico-59754-default-rtdb.firebaseio.com",
+  projectId: "alorico-59754",
+  storageBucket: "alorico-59754.firebasestorage.app",
+  messagingSenderId: "120993494626",
+  appId: "1:120993494626:web:9f9cb0ad6fbfbd1abd033b"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+
+let clienteId = localStorage.getItem("clienteId");
+if (!clienteId) {
+  clienteId = "cliente_" + Date.now();
+  localStorage.setItem("clienteId", clienteId);
 }
 
-const pedidoKey = "carritoPedido";
-let productoSeleccionado = {};
+const pedidoRef = ref(db, "pedidos/" + clienteId);
 
-// LINKS
+// NAV
 btnPizza.onclick = () => location.href="https://alo-rico.github.io/pizza/";
 btnLomitos.onclick = () => location.href="https://alo-rico.github.io/lomitos/";
 btnBebidas.onclick = () => location.href="https://alo-rico.github.io/bebidas/";
-
 btnCarrito.onclick = () => {
  document.getElementById("pedido-flotante").classList.toggle("activo");
 };
 
-// CERRAR PEDIDO AL TOCAR AFUERA
-document.addEventListener("click", function(e) {
-  const panel = document.getElementById("pedido-flotante");
-  const boton = document.getElementById("btnCarrito");
-  if (panel.classList.contains("activo") && !panel.contains(e.target) && e.target !== boton) {
-    panel.classList.remove("activo");
+// ESCUCHAR PEDIDO
+onValue(pedidoRef, (snapshot) => {
+  const data = snapshot.val();
+  const lista = document.getElementById("lista-pedido");
+  const totalTxt = document.getElementById("total-pedido");
+  const mensaje = document.getElementById("mensaje-total");
+
+  lista.innerHTML = "";
+  let total = 0;
+
+  if (data) {
+    Object.entries(data).forEach(([key, p]) => {
+      const li = document.createElement("li");
+      li.innerHTML = `${p.cantidad} x ${p.nombre} - Gs. ${(p.precio*p.cantidad).toLocaleString()}`;
+      lista.appendChild(li);
+      total += p.precio * p.cantidad;
+    });
+
+    totalTxt.innerText = "Total: Gs. " + total.toLocaleString();
+    mensaje.innerText = "💰 Total: Gs. " + total.toLocaleString();
+    mensaje.style.display = "block";
+  } else {
+    totalTxt.innerText = "";
+    mensaje.style.display = "none";
   }
 });
 
-// CARGAR MENU
-document.addEventListener('DOMContentLoaded', async () => {
-
-const res = await fetch("https://raw.githubusercontent.com/Alo-Rico/hamburguesa/main/precios.json");
-const productos = await res.json();
-
-const menu = document.getElementById('menu');
-
-Object.entries(productos).forEach(([nombre, info]) => {
-
-  const card = document.createElement('div');
-  card.className = 'product';
-
-  card.innerHTML = `
-    <img src="imagen/${info.imagen}" class="img-click">
-    <h3>${nombre}</h3>
-    <p>Gs. ${info.precio.toLocaleString()}</p>
-  `;
-
-  card.querySelector(".img-click").onclick = () => abrirPopup(nombre, info.precio);
-
-  menu.appendChild(card);
-
-});
-
-renderPedido();
-actualizarMensajeTotal();
-
-});
-
-// POPUP
-function abrirPopup(nombre, precio){
-  productoSeleccionado={nombre,precio};
-  document.getElementById("popup-nombre").innerText=nombre;
-  document.getElementById("popup-cantidad").style.display="flex";
-}
-
-function cerrarPopup(){
- document.getElementById("popup-cantidad").style.display="none";
-}
-
-function confirmarCantidad(){
+// AGREGAR PRODUCTO
+window.confirmarCantidad = function(){
  const cant = parseInt(document.getElementById("popup-input").value)||1;
- const pedido = JSON.parse(localStorage.getItem(pedidoKey))||[];
 
- pedido.push({
-  nombre: productoSeleccionado.nombre+" x"+cant,
-  precio: productoSeleccionado.precio*cant
+ push(pedidoRef, {
+  nombre: productoSeleccionado.nombre,
+  precio: productoSeleccionado.precio,
+  cantidad: cant
  });
-
- localStorage.setItem(pedidoKey, JSON.stringify(pedido));
 
  cerrarPopup();
- renderPedido();
- actualizarMensajeTotal();
-}
-
-// PEDIDO
-function renderPedido(){
- const lista=document.getElementById("lista-pedido");
- const totalTxt=document.getElementById("total-pedido");
-
- const pedido=JSON.parse(localStorage.getItem(pedidoKey))||[];
-
- lista.innerHTML="";
- let total=0;
-
- pedido.forEach((p,i)=>{
-  const li=document.createElement("li");
-  li.innerHTML = `${p.nombre} - Gs. ${p.precio.toLocaleString()} 
-  <img src="basurero.png" onclick="eliminarItem(${i})" style="width:18px;float:right;cursor:pointer;">`;
-  lista.appendChild(li);
-  total+=p.precio;
- });
-
- totalTxt.innerText="Total: Gs. "+total.toLocaleString();
-}
-
-function eliminarItem(i){
- const pedido=JSON.parse(localStorage.getItem(pedidoKey))||[];
- pedido.splice(i,1);
- localStorage.setItem(pedidoKey, JSON.stringify(pedido));
- renderPedido();
- actualizarMensajeTotal();
-}
-
-document.getElementById("btn-borrar").onclick = ()=>{
- localStorage.removeItem(pedidoKey);
- renderPedido();
- actualizarMensajeTotal();
- document.getElementById("pedido-flotante").classList.remove("activo");
 };
 
+let productoSeleccionado = {};
+
+window.abrirPopup = (n,p)=>{
+ productoSeleccionado={nombre:n,precio:p};
+ document.getElementById("popup-nombre").innerText=n;
+ document.getElementById("popup-cantidad").style.display="flex";
+};
+
+window.cerrarPopup = ()=>{
+ document.getElementById("popup-cantidad").style.display="none";
+};
+
+// BORRAR
+document.getElementById("btn-borrar").onclick = ()=> remove(pedidoRef);
+
+// WHATSAPP
 document.getElementById("enviar-whatsapp").onclick = ()=>{
- const pedido=JSON.parse(localStorage.getItem(pedidoKey))||[];
- if(pedido.length===0) return alert("No hay nada en el pedido");
+ onValue(pedidoRef,(snap)=>{
+  const data=snap.val();
+  if(!data) return alert("Vacío");
 
- let msg="Hola, quiero pedir:%0A";
- pedido.forEach(p=> msg+=`- ${p.nombre}%0A`);
+  let msg="Hola quiero pedir:\n";
+  let total=0;
 
- const total = pedido.reduce((sum,p)=>sum+p.precio,0);
+  Object.values(data).forEach(p=>{
+   msg+=`${p.cantidad} x ${p.nombre}\n`;
+   total+=p.precio*p.cantidad;
+  });
 
- window.open(`https://wa.me/+595971891251?text=${msg}%0ATotal: Gs. ${total.toLocaleString()}`);
-
- localStorage.removeItem(pedidoKey);
- renderPedido();
- actualizarMensajeTotal();
- document.getElementById("pedido-flotante").classList.remove("activo");
+  msg+=`\nTotal: Gs. ${total.toLocaleString()}`;
+  window.open("https://wa.me/?text="+encodeURIComponent(msg));
+ },{onlyOnce:true});
 };
+
+// CARGAR MENU
+const res = await fetch("https://raw.githubusercontent.com/Alo-Rico/hamburguesa/main/precios.json");
+const productos = await res.json();
+const menu = document.getElementById("menu");
+
+Object.entries(productos).forEach(([n,i])=>{
+ const card=document.createElement("div");
+ card.className="product";
+ card.innerHTML=`<img src="imagen/${i.imagen}"><h3>${n}</h3><p>Gs. ${i.precio}</p>`;
+ card.onclick=()=>abrirPopup(n,i.precio);
+ menu.appendChild(card);
+});
 
 </script>
 

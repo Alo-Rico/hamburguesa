@@ -174,12 +174,12 @@ document.getElementById("btnPizza").onclick = () => {
   window.location.href = "https://1967-rob.github.io/pizza/";
 };
 
-document.getElementById("btnHamburguesas").onclick = () => {
-  window.location.href = "https://alo-rico.github.io/precios-alorico-hamburguesa/";
+document.getElementById("btnLomitos").onclick = () => {
+  window.location.href = "https://alo-rico.github.io/precios-alorico-lomitos/";
 };
 
-document.getElementById("btnLomitos").onclick = () => {
-  window.location.href = "https://alo-rico.github.io/lomitos/";
+document.getElementById("btnBebidas").onclick = () => {
+  window.location.href = "https://alo-rico.github.io/bebidas/";
 };
 
  document.addEventListener("click", function(e) {
@@ -242,7 +242,7 @@ document.getElementById("pedido-flotante").classList.remove("activo");
 
   async function cargarMenu() {
   try {
-    const res = await fetch("precios-bebidas.json");
+    const res = await fetch("precios.json");
     const productos = await res.json();
     productosGlobal = productos;
     const menu = document.getElementById('menu');

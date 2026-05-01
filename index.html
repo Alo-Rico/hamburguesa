@@ -64,6 +64,7 @@ header img.icono { width:60px; }
 #btnPizza { background:#ffc107; color:#000; }
 #btnLomitos { background:#ff5722; }
 #btnBebidas { background:#00bcd4; }
+#btnCarrito { background:#007bff; }
 
 </style>
 </head>
@@ -78,11 +79,12 @@ header img.icono { width:60px; }
 
 <div class="menu-container" id="menu"></div>
 
-<!-- 🔥 BOTONES EXACTOS -->
+<!-- 🔥 BOTONES COMPLETOS -->
 <div class="btn-grid">
   <button id="btnPizza" class="btn-flotante">PIZZAS</button>
   <button id="btnLomitos" class="btn-flotante">LOMITOS</button>
   <button id="btnBebidas" class="btn-flotante">BEBIDAS</button>
+  <button id="btnCarrito" class="btn-flotante">MI PEDIDO</button>
 </div>
 
 <script>
@@ -96,6 +98,10 @@ document.getElementById("btnLomitos").onclick = () => {
 
 document.getElementById("btnBebidas").onclick = () => {
   window.location.href = "https://alo-rico.github.io/bebidas/";
+};
+
+document.getElementById("btnCarrito").onclick = () => {
+  alert("Abrir pedido (igual que bebidas)");
 };
 
 // CARGAR MENU

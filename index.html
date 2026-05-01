@@ -89,7 +89,7 @@ header img.icono { width:60px; }
 
 <script>
 document.getElementById("btnPizza").onclick = () => {
-  window.location.href = "https://1967-rob.github.io/precios-alo-rico/";
+  window.location.href = "https://1967-rob.github.io/pizza/";
 };
 
 document.getElementById("btnLomitos").onclick = () => {
@@ -108,7 +108,7 @@ document.getElementById("btnCarrito").onclick = () => {
 document.addEventListener('DOMContentLoaded', async () => {
   const menu = document.getElementById('menu');
 
-  const res = await fetch("https://raw.githubusercontent.com/Alo-Rico/precios-alorico-hamb-lomito/main/precios.json");
+  const res = await fetch("https://raw.githubusercontent.com/Alo-Rico/precios-alorico-hamburguesa/main/precios.json");
   const productos = await res.json();
 
   Object.entries(productos).forEach(([nombre, info]) => {

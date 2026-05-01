@@ -108,7 +108,7 @@ document.getElementById("btnCarrito").onclick = () => {
 document.addEventListener('DOMContentLoaded', async () => {
   const menu = document.getElementById('menu');
 
-  const res = await fetch("https://raw.githubusercontent.com/Alo-Rico/precios-alorico-hamburguesa/main/precios.json");
+  const res = await fetch("https://github.com/Alo-Rico/hamburguesa/blob/main/precios.json");
   const productos = await res.json();
 
   Object.entries(productos).forEach(([nombre, info]) => {

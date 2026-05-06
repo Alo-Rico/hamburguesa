@@ -55,6 +55,7 @@ header img.icono {
 }
 
 /* BOTONES */
+
 button{
  transition: all 0.15s ease;
  box-shadow: 0 4px 0 rgba(0,0,0,0.2);
@@ -66,13 +67,13 @@ button:active{
 }
 
 .btn-grid {
-  position:fixed;
-  right:15px;
-  bottom:15px;
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:10px;
-  z-index:10000;
+  position: fixed;
+  right: 15px;
+  bottom: 15px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  z-index: 10000;
 }
 
 .btn-flotante {
@@ -86,11 +87,11 @@ button:active{
 
 #btnPizza {
   background:#ffc107;
-  color:black;
+  color:#000;
 }
 
 #btnLomitos {
-  background:#ff9800;
+  background:#ff5722;
 }
 
 #btnBebidas {
@@ -98,7 +99,7 @@ button:active{
 }
 
 #btnCarrito {
-  background:#ff5722;
+  background:#28a745;
 }
 
 /* TOTAL FLOTANTE */
@@ -186,25 +187,25 @@ button:active{
 /* POPUP */
 
 #popup-cantidad {
-  display:none;
-  position:fixed;
-  top:0;
-  left:0;
-  width:100%;
-  height:100%;
-  background:rgba(0,0,0,0.5);
-  justify-content:center;
-  align-items:center;
-  z-index:99999;
+ display:none;
+ position:fixed;
+ top:0;
+ left:0;
+ width:100%;
+ height:100%;
+ background:rgba(0,0,0,0.5);
+ justify-content:center;
+ align-items:center;
+ z-index:99999;
 }
 
 .popup-content {
-  background:white;
-  padding:20px;
-  border-radius:10px;
-  width:300px;
-  text-align:center;
-  box-shadow:0 10px 30px rgba(0,0,0,0.3);
+ background:white;
+ padding:20px;
+ border-radius:10px;
+ width:300px;
+ text-align:center;
+ box-shadow:0 10px 30px rgba(0,0,0,0.3);
 }
 </style>
 </head>
@@ -229,7 +230,7 @@ button:active{
 
 <div class="acciones-pedido">
 <button id="btn-borrar">Borrar</button>
-<button id="enviar-whatsapp">Enviar pedido</button>
+<button id="enviar-whatsapp">Enviar</button>
 </div>
 </div>
 
@@ -264,16 +265,8 @@ button:active{
 
 <!-- 🔥 FIREBASE -->
 <script type="module">
-
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
-
-import {
- getDatabase,
- ref,
- push,
- onValue,
- remove
-} from "https://www.gstatic.com/firebasejs/10.7.0/firebase-database.js";
+import { getDatabase, ref, push, onValue, remove } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-database.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyADGYsqhbCFuKj2fXpontLpND_rtT7Nlno",
@@ -297,8 +290,7 @@ if (!clienteId) {
 
 const pedidoRef = ref(db, "pedidos/" + clienteId);
 
-/* BOTONES */
-
+// NAV
 document.getElementById("btnPizza").onclick = () =>
  location.href="https://alo-rico.github.io/pizza/";
 
@@ -325,24 +317,23 @@ document.getElementById("btnCarrito").onclick = () => {
 
 function actualizarMensajeTotal(total){
 
- const mensajeTotal =
+ const mensaje =
  document.getElementById("mensaje-total");
 
  if(total > 0){
 
-  mensajeTotal.innerHTML =
-  `💰 Total: Gs. ${total.toLocaleString()}`;
+  mensaje.innerText =
+  "💰 Total: Gs. " + total.toLocaleString();
 
-  mensajeTotal.style.display = "block";
+  mensaje.style.display = "block";
 
  }else{
 
-  mensajeTotal.style.display = "none";
+  mensaje.style.display = "none";
  }
 }
 
-/* ESCUCHAR PEDIDO */
-
+// ESCUCHAR PEDIDO
 onValue(pedidoRef, (snapshot) => {
 
   const data = snapshot.val();
@@ -390,14 +381,21 @@ onValue(pedidoRef, (snapshot) => {
 
       total += p.precio * p.cantidad;
     });
+
+    totalTxt.innerText =
+    "Total: Gs. " + total.toLocaleString();
+
+    actualizarMensajeTotal(total);
+
+  } else {
+
+    totalTxt.innerText = "";
+
+    actualizarMensajeTotal(0);
   }
-
-  totalTxt.innerText = "Total: Gs. " + total.toLocaleString();
-
-  actualizarMensajeTotal(total);
 });
 
-/* AGREGAR PRODUCTO */
+// AGREGAR PRODUCTO
 
 window.confirmarCantidad = function(){
 
@@ -410,17 +408,14 @@ window.confirmarCantidad = function(){
   cantidad: cant
  });
 
- window.cerrarPopup();
+ cerrarPopup();
 };
 
 let productoSeleccionado = {};
 
 window.abrirPopup = (n,p)=>{
 
- productoSeleccionado={
-  nombre:n,
-  precio:p
- };
+ productoSeleccionado={nombre:n,precio:p};
 
  document.getElementById("popup-nombre").innerText=n;
 
@@ -432,20 +427,18 @@ window.cerrarPopup = ()=>{
  document.getElementById("popup-cantidad").style.display="none";
 };
 
-/* ELIMINAR */
-
+// ELIMINAR
 window.eliminarItem = function(key){
 
  remove(ref(db, "pedidos/" + clienteId + "/" + key));
 
 }
 
-/* BORRAR */
-
+// BORRAR
 document.getElementById("btn-borrar").onclick =
  ()=> remove(pedidoRef);
 
-/* WHATSAPP */
+  /* WHATSAPP */
 
 document.getElementById("btn-enviar").onclick = () => {
 
@@ -475,7 +468,9 @@ document.getElementById("btn-enviar").onclick = () => {
  },{onlyOnce:true});
 };
 
-/* MENU */
+
+
+// CARGAR MENU
 
 const res = await fetch("https://raw.githubusercontent.com/Alo-Rico/hamburguesa/main/precios.json");
 
@@ -495,7 +490,7 @@ Object.entries(productos).forEach(([n,i])=>{
  <p>Gs. ${i.precio}</p>
  `;
 
- card.onclick=()=>window.abrirPopup(n,i.precio);
+ card.onclick=()=>abrirPopup(n,i.precio);
 
  menu.appendChild(card);
 });

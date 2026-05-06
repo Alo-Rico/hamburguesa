@@ -587,11 +587,11 @@ Object.entries(data).forEach(([n,i])=>{
 
  card.className = "product";
 
- card.innerHTML = `
-  <img src="lomitos/${i.imagen}">
+card.innerHTML = `
+  <img src="imagen/${i.imagen}">
   <h3>${n}</h3>
   <p>Gs. ${i.precio.toLocaleString()}</p>
- `;
+`;
 
  card.addEventListener("click",(e)=>{
 

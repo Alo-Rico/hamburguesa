@@ -472,29 +472,32 @@ document.getElementById("btn-enviar").onclick = () => {
 
 // CARGAR MENU
 
-const res = await fetch("https://raw.githubusercontent.com/Alo-Rico/hamburguesa/main/precios.json");
+const res = await fetch("./precios.json");
 
-const productos = await res.json();
+const data = await res.json();
 
-const menu = document.getElementById("menu");
-
-Object.entries(productos).forEach(([n,i])=>{
+Object.entries(data).forEach(([n,i])=>{
 
  const card=document.createElement("div");
 
  card.className="product";
 
- card.innerHTML=`
- <img src="imagen/${i.imagen}">
- <h3>${n}</h3>
- <p>Gs. ${i.precio}</p>
+ card.innerHTML = `
+  <img src="imagen/${i.imagen}" class="img-click">
+  <h3>${n}</h3>
+  <p>Gs. ${i.precio}</p>
  `;
 
- card.onclick=()=>abrirPopup(n,i.precio);
+ card.addEventListener("click", (e) => {
 
- menu.appendChild(card);
+  e.stopPropagation();
+
+  window.abrir(n, i.precio);
+
+ });
+
+ document.getElementById("menu").appendChild(card);
 });
-
 </script>
 
 </body>
